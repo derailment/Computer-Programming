@@ -8,6 +8,7 @@ import javax.swing.border.LineBorder;
  
 import java.io.File;
 import java.io.IOException;
+import java.io.FileWriter;
 
 import java.util.*;
 
@@ -102,7 +103,7 @@ public class Visualizer extends JFrame implements ActionListener{
         panel2.setLayout(new BorderLayout());
         panel2.setBackground(Color.BLACK);
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        panel2.setPreferredSize(new Dimension((int)(screenSize.getWidth()*0.6),(int)(screenSize.getHeight()*0.05)));
+        panel2.setPreferredSize(new Dimension((int)(screenSize.getWidth()*0.4),(int)(screenSize.getHeight()*0.05)));
         
         // Add components to panel 2
         panel2.add(desk);
@@ -154,65 +155,83 @@ public class Visualizer extends JFrame implements ActionListener{
     }
     
     private void setSeat(){
+    	try {
+    		
+    		// Export csv file
+    		FileWriter filewriter = new FileWriter("seat.csv");
     	
-    	// Panel 3 setting
-    	panel3=new JPanel();
-        panel3.setLayout(new GridLayout(row,col));
-        panel3.setBackground(Color.BLACK);
-        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        panel3.setPreferredSize(new Dimension((int)(screenSize.getWidth()*0.8),(int)(screenSize.getHeight()*0.8)));
-        
-        // Add panel 3 to frame
-        frame.add(panel3);
-        
-        // Seat setting
-        for(int i=0;i<row-1;i++){
-            for(int j=0;j<col;j++){
-            	JLabel name=new JLabel(namelist.get(idlist.get(i*col+j)));
-            	name.setHorizontalAlignment(JLabel.CENTER);
-            	name.setFont(new java.awt.Font("DIALOG",1,20)); 
-            	name.setBorder(BorderFactory.createEtchedBorder());
-            	name.setOpaque(true);
-            	name.setBackground(Color.GRAY);
-            	name.setForeground(Color.WHITE);
-            	GridBagConstraints pos_name = new GridBagConstraints();
-            	pos_name.gridx=j;
-            	pos_name.gridy=i;
-            	pos_name.gridwidth=1;
-            	pos_name.gridheight=1;
-            	pos_name.weightx = 1;
-            	pos_name.weighty = 1;
-            	panel3.add(name,pos_name);
-            }
-        }
-        
-        // Shift for classroom
-        int empty=row*col-namesize;
-        for(int j=0;j<col;j++){
-        	JLabel name;
-        	if(j<empty){
-        		name=new JLabel(namelist.get(idlist.get(row*col-empty+j)));
-        	}
-        	else{
-        		name=new JLabel(namelist.get(idlist.get((row-1)*col+j-empty)));
-        	}
-        	name.setHorizontalAlignment(JLabel.CENTER);
-        	name.setFont(new java.awt.Font("DIALOG",1,20)); 
-        	name.setBorder(BorderFactory.createEtchedBorder());
-        	name.setOpaque(true);
-        	name.setBackground(Color.GRAY);
-        	name.setForeground(Color.WHITE);
-        	GridBagConstraints pos_name = new GridBagConstraints();
-        	pos_name.gridx=j;
-        	pos_name.gridy=row-1;
-        	pos_name.gridwidth=1;
-        	pos_name.gridheight=1;
-        	pos_name.weightx = 1;
-        	pos_name.weighty = 1;
-        	panel3.add(name,pos_name);
-       }
-        
-        panel3.updateUI();  
+	    	// Panel 3 setting
+	    	panel3=new JPanel();
+	        panel3.setLayout(new GridLayout(row,col));
+	        panel3.setBackground(Color.BLACK);
+	        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+	        panel3.setPreferredSize(new Dimension((int)(screenSize.getWidth()*0.8),(int)(screenSize.getHeight()*0.8)));
+	        
+	        // Add panel 3 to frame
+	        frame.add(panel3);
+	        
+	        // Seat setting
+	        for(int i=0;i<row-1;i++){
+	            for(int j=0;j<col;j++){
+	            	String student = namelist.get(idlist.get(i*col+j));
+	            	filewriter.append(student);
+	            	if(j==col-1){
+	            		filewriter.append("\n");
+	            	}
+	            	else {
+	            		filewriter.append(",");
+	            	}
+	            	JLabel name=new JLabel(student);
+	            	name.setHorizontalAlignment(JLabel.CENTER);
+	            	name.setFont(new java.awt.Font("DIALOG",1,20)); 
+	            	name.setBorder(BorderFactory.createEtchedBorder());
+	            	name.setOpaque(true);
+	            	name.setBackground(Color.GRAY);
+	            	name.setForeground(Color.WHITE);
+	            	GridBagConstraints pos_name = new GridBagConstraints();
+	            	pos_name.gridx=j;
+	            	pos_name.gridy=i;
+	            	pos_name.gridwidth=1;
+	            	pos_name.gridheight=1;
+	            	pos_name.weightx = 1;
+	            	pos_name.weighty = 1;
+	            	panel3.add(name,pos_name);
+	            }
+	        }
+	        
+	        // Shift for classroom
+	        int empty=row*col-namesize;
+	        for(int j=0;j<col;j++){
+	        	JLabel name;
+	        	if(j<empty){
+	        		name=new JLabel(namelist.get(idlist.get(row*col-empty+j)));
+	        	}
+	        	else{
+	        		name=new JLabel(namelist.get(idlist.get((row-1)*col+j-empty)));
+	        	}
+	        	name.setHorizontalAlignment(JLabel.CENTER);
+	        	name.setFont(new java.awt.Font("DIALOG",1,20)); 
+	        	name.setBorder(BorderFactory.createEtchedBorder());
+	        	name.setOpaque(true);
+	        	name.setBackground(Color.GRAY);
+	        	name.setForeground(Color.WHITE);
+	        	GridBagConstraints pos_name = new GridBagConstraints();
+	        	pos_name.gridx=j;
+	        	pos_name.gridy=row-1;
+	        	pos_name.gridwidth=1;
+	        	pos_name.gridheight=1;
+	        	pos_name.weightx = 1;
+	        	pos_name.weighty = 1;
+	        	panel3.add(name,pos_name);
+	       }
+	        
+	        panel3.updateUI(); 
+	        
+	        filewriter.close();
+    	}
+    	catch(Exception e){
+    		e.printStackTrace();
+    	}
         
     }
     
