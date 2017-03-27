@@ -204,10 +204,16 @@ public class Visualizer extends JFrame implements ActionListener{
 	        for(int j=0;j<col;j++){
 	        	JLabel name;
 	        	if(j<empty){
-	        		name=new JLabel(namelist.get(idlist.get(row*col-empty+j)));
+	        		String student = namelist.get(idlist.get(row*col-empty+j));
+	        		filewriter.append(student);
+	        		filewriter.append(",");
+	        		name=new JLabel();
 	        	}
 	        	else{
-	        		name=new JLabel(namelist.get(idlist.get((row-1)*col+j-empty)));
+	        		String student = namelist.get(idlist.get((row-1)*col+j-empty));
+	        		filewriter.append(student);
+	        		filewriter.append(",");
+	        		name=new JLabel(student);
 	        	}
 	        	name.setHorizontalAlignment(JLabel.CENTER);
 	        	name.setFont(new java.awt.Font("DIALOG",1,20)); 
