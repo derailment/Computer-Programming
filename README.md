@@ -278,3 +278,234 @@ public class RPG {
 [1] 林信良 (2014)。Java SE 8 技術手冊。GOTOP Information Inc。
 
 **[Back to top](#目錄)**
+
+## 物件住在哪裡？
+
+每當我們創建物件時其實我們是在幫一堆位元資料找一個家安置，而那個家就是俗稱的記憶體位置。
+Object o = new Object(); 
+
+以下示範物件何時會隨著「=」搬家：
+
+After tmpLine = lines[i - 1];
+Temporary Line is at Line2D@6d06d69c
+Indexed Line is at Line2D@6d06d69c
+After lines[i - 1] = lines[j];
+Temporary Line is at Line2D@6d06d69c
+Indexed Line is at Line2D@7852e922
+After tmpLine = lines[i - 1];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@4e25154f
+After lines[i - 1] = lines[j];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@6d06d69c
+After tmpLine = lines[i - 1];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@4e25154f
+After lines[i - 1] = lines[j];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@70dea4e
+After tmpLine = lines[i - 1];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@4e25154f
+After lines[i - 1] = lines[j];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@5c647e05
+After tmpLine = lines[i - 1];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@4e25154f
+After lines[i - 1] = lines[j];
+Temporary Line is at Line2D@4e25154f
+Indexed Line is at Line2D@4e25154f
+
+直接看碼：
+```
+public class TestLine2D {
+	public static void main(String[] args) {
+		Line2D[] lines = new Line2D[5];
+		for (int i = 0; i < lines.length; i++) {
+			lines[i] = new Line2D(Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10);
+		}
+
+		printInShuffle(lines);
+
+	}
+	
+	public static void printInSequence(Line2D[] lines){
+		for(Line2D line: lines){
+			System.out.print(" " + line.getLength());
+		}	
+		System.out.print("\n");
+	}
+	
+	public static void printInShuffle(Line2D[] lines){
+		Line2D tmpLine;
+		for(int i = lines.length ; i >= 1 ; i--){
+			int j = (int)(Math.random() * i);
+			tmpLine = lines[i - 1];
+			System.out.println("After tmpLine = lines[i - 1];");
+			System.out.println("Temporary Line is at " + tmpLine);
+			System.out.println("Indexed Line is at " + lines[i-1]);
+			lines[i - 1] = lines[j];
+			System.out.println("After lines[i - 1] = lines[j];");
+			System.out.println("Temporary Line is at " + tmpLine);
+			System.out.println("Indexed Line is at " + lines[i-1]);
+			lines[j] = tmpLine;
+		}
+		
+	}
+
+}
+
+class Line2D {
+	
+	private double x1;
+	private double y1;
+	private double x2;
+	private double y2;
+	private double length;
+	
+	Line2D(double x1, double y1, double x2, double y2){
+		this.x1 = x1;
+		this.y1 = y1;
+		this.x2 = x2;
+		this.y2 = y2;
+		this.length = Math.sqrt(Math.pow(y2-y1, 2) + Math.pow(x2-x1, 2));
+	}
+	
+	public double getLength(){
+		return this.length;
+	}
+	
+}
+```
+
+**[Back to top](#目錄)**
+
+## Bitwise  Operator的奇淫巧技
+在Java舉凡能夠視為整數值的型別(int、long、short、byte、char)變數都可以被轉成二進位制以Bitwise Operator操作，例如
+```
+int a=1;
+a *= 2;
+```
+等價
+```
+a <<= 1;
+```
+### 為什麼要用Bitwise Operator?
+因為```a <<= 1```比```a *= 2```快，所以通常越是底層的Library就越常看見開發人員偏好二進位操作，我們不希望一個很基本的函式由於實作方式太耗時間就拖垮了那些使用它的程式。
+
+### 先備知識
+1. **^** XOR Bitwise Operator:
+<table>
+<tr><th>Operand1</th><th>Operand2</th><th>Result</th></tr>
+<tr><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>0</td><td>1</td><td>1</td></tr>
+</table>
+
+2. **&** AND Bitwise Operator
+<table>
+<tr><th>Operand1</th><th>Operand2</th><th>Result</th></tr>
+<tr><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td>0</td><td>0</td></tr>
+<tr><td>0</td><td>1</td><td>0</td></tr>
+</table>
+
+3. **|** OR Bitwise Operator
+<table>
+<tr><th>Operand1</th><th>Operand2</th><th>Result</th></tr>
+<tr><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>0</td><td>1</td><td>1</td></tr>
+</table>
+
+4. **<<** Left Shift Operator
+「a<<b」代表a向左移b個位置，其右邊補b個0。
+
+5. **>>>** Unsigned (Logical) Right Shift Operator
+「a>>>b」代表a向右移b個位置，其左邊補b個0。
+
+6. **>>** Signed (Arithmetic) Right Shift Operator
+ 「a>>b」代表a向右移b個位置，其左邊補原本最左邊的位元值。
+ 
+ ## 二補數(2's Complement)系統
+ Java的int變數佔4個byte，也就是32個bit，每個bit上面不是0就是1。
+例如
+$(00000000 00000000 00000000 00000001)_2 = (1)_{10}$
+$(00000000 00000000 00000000 00000010)_2 = (2)_{10}$
+$(00000000 00000000 00000000 00000100)_2 = (4)_{10}$
+$(00000000 00000000 00000000 00000111)_2 = (7)_{10}$
+
+聰明如你，那負整數怎麼辦？
+所謂的二補數系統，就是在能夠表達負整數的那麼多種系統中的其中一個系統而已。
+它的特徵就是把最左邊的位元當作正負號，1代表負數，0代表正數。
+例如
+$(10000000 00000000 00000000 00000001)_2$是負的。
+$(00000000 00000000 00000000 00000001)_2$是正的。
+
+再來是知道正負號之後，它的絕對值怎麼算呢？
+*    正整數之前講過了
+*    負整數的遊戲規則就是，**遮掉最左邊的負號，把剩下的位元值取補數，再加1**。
+例如
+$(10000000 00000000 00000000 00000001)_2$
+$=(-1)_{10}\times((1111111 11111111 11111111 11111110)_2+1)$
+$= (-1)_{10}\times(2^1+2^2+2^3+...+2^{29}+2^
+{30}+1) = -2147483647$
+
+從二進位的角度，我們可以輕易地猜出int的最大正整數值及最小負整數值。
+*    int最大正整數
+$(01111111 11111111 11111111 11111111)_2 = 2147483647$
+
+*    int最小負整數
+$(10000000 00000000 00000000 00000000)_2 = -(2147483647+1) = -2147483648$
+
+*    那0呢？
+$(00000000 00000000 00000000 00000000)_2 = 0$
+
+ ## 基本的經典操作
+ 
+ *    把左移 **<<** 看成是 **乘2的幾次方**
+
+例如
+$(00000000 00000000 00000000 00000110)_2 = (6)_{10}$
+往左移4個位置
+$(00000000 00000000 00000000 01100000)_2 = (96)_{10} = 6 \times 2^4$
+
+**但是！！！移過頭就不見了喔**
+如果把6左移100個位置，答案會是0喔(不會循環的意思)。
+
+*    把右移 **>>>** 看成是 **除2的幾次方**
+
+例如
+$(00000000 00000000 00000000 01100000)_2 = (96)_{10}$
+往右移4個位置
+$(00000000 00000000 00000000 00000110)_2 = (6)_{10} = 96 \div 2^4$
+
+**但是！！！失去的不一定能找回來**
+如果把
+$(11111000 00000000 00000000 00000000)_2 = -134217728$
+向左移4個位置
+$(10000000 00000000 00000000 00000000)_2 = -2147483648$
+再向右移4個位置
+$(00001000 00000000 00000000 00000000)_2 = 134217728$
+答案可是不會變回來的喔
+
+*    把右移 **>>** 看成是 **除2的幾次方** 並且 **保留原來的正負號**
+
+例如
+$(11111111 11111111 11111111 11111110)_2 = -2$
+往右移4個位置，右邊再補滿原本的符號，即1(負號)
+$(11111111 11111111 11111111 11111111)_2 = -1 ＝ -2 \div2$
+原本是負的右移之後還是負的喔
+聰明如你，原本是正的右移之後也會是正的。
+
+### 進階的經典撥弄
+[Bit Twiddling Hacks](https://graphics.stanford.edu/~seander/bithacks.html#OperationCounting)
+
+### 小工具
+[進位換算計算機](http://dec.0123456789.tw/)
+
+**[Back to top](#目錄)**
