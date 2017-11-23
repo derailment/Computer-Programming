@@ -790,3 +790,56 @@ b <= Math.random() * a + b < a + b
 Donald E. Knuth. 1997. The Art of Computer Programming, Volume 2 (3rd Ed.): Seminumerical Algorithms. Addison-Wesley Longman Publishing Co., Inc., Boston, MA, USA.
 
 **[Back to top](#目錄)**
+
+## 問題大雜燴
+這裡擺放不知道怎麼分類但是蠻有趣的筆記，歡迎各方英雄好漢相繼補充。
+
+### 【題型】計算單字出現次數 
+*    消掉句點
+
+直接看碼:
+```
+String text = "A string is a sequence of characters. Strings are frequently used in programming. In many
+languages, strings are treated as an array of characters, but in Java a string is treated as an
+object. This chapter introduces the classes for processing strings.";
+text = text.replaceAll("\\.", "");
+text = text.toLowerCase();
+String[] words = text.split(" ");
+```
+解釋一下:
+replaceAll()的第一個引數要用正規表達式，例如「\\\\.」是句點的正規表達式，而這整個函式是用來把text裡面所有的句點都消去。當題目的輸入字串是由夾雜句點的句子所構成時就很好用。
+
+正規表達式是什麼?
+範例：Mr. Bon口吃（正規版解法）
+```
+import java.util.*;
+import java.util.regex.*;
+
+public class StammerTranslater {
+
+     public static void main(String []args){
+        System.out.print(" Mr. Bon says, ");
+        Scanner input = new Scanner(System.in);
+        String  s = input.nextLine();
+        s = Pattern.compile("\\A\"").matcher(s).replaceAll("");
+        s = Pattern.compile("\"\\Z").matcher(s).replaceAll("");
+        s = Pattern.compile("[a-zA-z]+-").matcher(s).replaceAll("");
+        System.out.println("Translating...");
+        System.out.println(s);
+     }
+}
+```
+正規表達式處理字串很強大，絕對值得一邊Google一邊閱讀推薦的書[1]。
+*   你知道ArrayList<String>可以裝東西。
+*   再讓你知道Map<String, Integer>可以一邊裝單字一邊裝數量。
+
+### 【JavaFX】Pane來Pane去的眉角
+*    Pane - getChildren().add()
+*    StackPane - getChildren().add()
+*    GridPane - add()
+*    BorderPane - setCenter(), setBottom()
+
+### 推薦的書
+[1] J. E. F. Friedl (2006). Mastering Regular Expressions (3rd ed.). O'Reilly Media, Inc.
+
+**[Back to top](#目錄)**
