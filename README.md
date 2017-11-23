@@ -212,28 +212,28 @@ Scanner放哪裡? Scanner提供我們各種應付標準輸入型態的method，�
     *   某個method裡嗎?  可以，但是那個class的定義必須要放在要new它的物件之前(因為要先讀得到它的定義嘛!)。可是這樣做會發生什麼事情?如果我們new很多不同的class，然後這些不同class又彼此有很複雜的牽涉關連，我們會搞混到底class的定義誰先誰後，所以**不建議這麼做**。
 
     *   某個public class的定義外面:
-這樣又分成兩種: 在同package下，放同一份檔案或是開另外一份檔案?
-在回答這個問題之前，我們要先搞懂**class的權限修飾**
-**就是說class會依據它前面是public、private、沒有寫等等的不同而決定誰可以用它**。
+這樣又分成兩種: 在同package下，放同一份檔案或是開另外一份檔案?  
+在回答這個問題之前，我們要先搞懂**class的權限修飾**  
+**就是說class會依據它前面是public、private、沒有寫等等的不同而決定誰可以用它**。  
 ![](https://hackpad-attachments.s3.amazonaws.com/java_ntuce.hackpad.com_kCzTFjVavKa_p.635140_1466605472462_undefined)
-    *    public class 全世界都可以用它。
-    *    所以把所有class的權限調成public是最安心的嗎?**但是別忘了一個.java檔只能出現一個public class**。
-    *    private class 只有 class自己本身可以用它自己。
-    *    什麼意思? 如果要使用這個class，勢必要在別的class的某個method(例如main)去new它，對不對? 但是只有它自己才能用它自己，所以**當然沒辦法在別的class去new它**。
-    *    沒有寫，只要是同package的其他class才可以使用它。 
-    *    Protected，教繼承再講…
+*   public class 全世界都可以用它。  
+所以把所有class的權限調成public是最安心的嗎?**但是別忘了一個.java檔只能出現一個public class**。  
+*   private class 只有 class自己本身可以用它自己。    
+什麼意思? 如果要使用這個class，勢必要在別的class的某個method(例如main)去new它，對不對? 但是只有它自己才能用它自己，所以**當然沒辦法在別的class去new它**。  
+*   沒有寫，只要是同package的其他class才可以使用它。   
+*   Protected，教繼承再講…  
 
-現在可以回答，class的定義要放哪裡了?
-如果你希望同package下的其他class都可以用某個class，那麼那個某個class就可以**不要加上權限修飾**或是**加上public在另一份檔案**。
+現在可以回答，class的定義要放哪裡了?  
+如果你希望同package下的其他class都可以用某個class，那麼那個某個class就可以**不要加上權限修飾**或是**加上public在另一份檔案**。  
 
-記得，**同一個package下不可以寫兩個一樣名字的class(無論是public或沒有寫權限)**。
+記得，**同一個package下不可以寫兩個一樣名字的class(無論是public或沒有寫權限)**。  
 
-(後記:開心的話也可以把自己寫的class壓成.jar匯入project的library喔!)
+(後記:開心的話也可以把自己寫的class壓成.jar匯入project的library喔!)  
 
 ### 實踐物件導向的精神
 
-*   繼承(Inherit)和介面(Interface)的存在是為了避免重複設計。
-*   繼承跟介面不一樣的地方：
+*   繼承(Inherit)和介面(Interface)的存在是為了避免重複設計。  
+*   繼承跟介面不一樣的地方：  
 <table style="font-size:13px;cell-spacing: 0px; border-collapse: collapse;"><tr><td style="border:1px solid #999; min-width: 50px;height: 22px;line-height: 16px;padding: 0 4px 0 4px;" class="added"></td>
 <td style="border:1px solid #999; min-width: 50px;height: 22px;line-height: 16px;padding: 0 4px 0 4px;" class="added">&#32380;&#25215;</td>
 <td style="border:1px solid #999; min-width: 50px;height: 22px;line-height: 16px;padding: 0 4px 0 4px;" class="added">&#20171;&#38754;</td>
@@ -252,8 +252,8 @@ Scanner放哪裡? Scanner提供我們各種應付標準輸入型態的method，�
 </tr>
 </table>
 
-*   多型(Polymorphism)就是一個物件在執行時期可以被當成不只一種型別(類別)。
-講個沒弄懂多型會發生Runtime Error或Compiling Error的例子：
+*   多型(Polymorphism)就是一個物件在執行時期可以被當成不只一種型別(類別)。  
+講個沒弄懂多型會發生Runtime Error或Compiling Error的例子：  
 ```java
 public class RPG {
     public static void main(String[] args){
