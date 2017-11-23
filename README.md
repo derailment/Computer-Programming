@@ -510,3 +510,283 @@ $(11111111 11111111 11111111 11111111)_2 = -1 ＝ -2 \div2$
 [進位換算計算機](http://dec.0123456789.tw/)
 
 **[Back to top](#目錄)**
+
+## 亂數夠不夠「亂」
+我們知道Java提供兩種方式讓我們產生亂數：
+*    java.lang.Math
+*    java.util.Random
+
+這兩者「使用」上，最大的差別是Random可以設亂數種子，但是當程式設下亂數種子後，發現每次產生的數字序列竟然是固定的？可是，亂數不是應該要很亂嗎？
+
+直接看碼：
+```
+import java.util.Random;
+public class TestRandom {
+    public static void main(String[] args) {
+        Random random = new Random(20);
+        System.out.print("nextInt(): ");
+        for(int i = 1; i <= 10; i++){
+            System.out.print(" " + random.nextInt());
+        }
+        System.out.print("\nnextInt(45): ");
+        for(int i = 1 ; i <= 10; i++){
+            System.out.print(" " + random.nextInt(45)); // Generate 0~44 positive integer
+        }
+    }
+}
+```
+
+不管執行幾百遍都是輸出這樣：
+nextInt():  -1150867590 -1704868423 884779003 -29161773 -885414485 -1791719506 700408466 -1654940986 665796387 -1584522320
+nextInt(45):  41 32 5 0 8 41 24 28 7 21
+
+如果我們把創建Random物件的方式改為no-arg constructor：
+```
+Random random = new Random();
+```
+每次的執行結果就會不一樣了。
+
+### 淺談偽隨機數產生器
+由於網路上難找解釋技術實作好讀的文章，所以就不想再花力氣另外寫導讀了，請自行閱讀[電腦的隨機數是如何做到的？](http://novus.pixnet.net/blog/post/32238099-%E9%9B%BB%E8%85%A6%E7%9A%84%E9%9A%A8%E6%A9%9F%E6%95%B8%E6%98%AF%E5%A6%82%E4%BD%95%E5%81%9A%E5%88%B0%E7%9A%84%3F)，有個概觀後，就來看Java又是怎麼實作Random的呢？
+
+### Random是怎麼實作的？
+我們去看GNU維護的類JDK所提供的[java.util.Random](http://developer.classpath.org/doc/java/util/Random-source.html)實作方式(雖然不是你們用的Oracle JDK，但是很像)。
+
+(私語：GNU就是堅持什麼都要開放，有別於什麼都要吉吉吉的公司...)
+
+我們來解說幾個範例有用到的public method:
+*    Random()
+
+如果你要讓每次的執行結果不一樣，就不要設固定的亂數種子，採用Random()。
+```
+public Random()
+{
+    this(System.currentTimeMillis());
+}
+```
+發現好玩的事情了嗎？this()是什麼？
+我們之前講過this就是指「Random這個物件」，所以this()在這裡就是用來呼叫「Random(long seed)」。故就算你用no-arg的Random()去創建物件，它其實也是去呼叫Random(long seed)，只是只是！！！它幫你傳入的亂數種子是「當下時間」，又因為你每次執行程式的當下時間一定不一樣(可能差幾毫秒鐘)，所以乍看之下，我們誤以為Random()創建的物件所得到的亂數是不固定的。
+*    Random(long seed)
+
+如果看不懂上一段講什麼，那白話文就是
+```
+Random random = new Random();
+```
+等價
+```
+Random random = new Random(System.currentTimeMillis());
+```
+結束。
+
+我們來看看那Random(long seed)在做什麼？
+```
+public Random(long seed)
+{
+    setSeed(seed);
+}
+```
+seed是Random的private long data field，然後又要去看setSeed(long seed)在做什麼。
+*    setSeed(long seed)
+```
+public synchronized void setSeed(long seed)
+{
+    this.seed = (seed ^ 0x5DEECE66DL) & ((1L << 48) - 1);
+    haveNextNextGaussian = false;
+}
+```
+我們需要解讀this.seed被設成什麼？
+先備知識：
+1. [Bitwise Operator的奇淫巧技](https://hackmd.io/s/BJV65qVgW)
+
+2. 用**0x**開頭表示十六進位的數字。
+
+3. 數字以**L**結尾，代表那個數字的型態是long。
+
+首先```((1L << 48) - 1)```為$2^{48} - 1$，因為把二進位的1向左移48個位置再補0，轉成十進位，再減1。
+
+再來看```0x5DEECE66DL```在不同的進位制是多少？
+<table>
+<tr><td>Binary Digits</td><td>10111011110111011001110011001101101</td></tr>
+<tr><td>Decimal Digits</td><td>25214903917</td></tr>
+<tr><td>Hexadecimal Digits</td><td>5DEECE66D</td></tr>
+</table>
+
+全部查完了，你就能恍然明白
+``` this.seed = (seed ^ 0x5DEECE66DL) & ((1L << 48) - 1);```
+為什麼要這樣設嗎？
+才有鬼！
+我們先繼續把這幾個用到的method之間呼叫的關係釐清。
+
+*    nextInt()
+
+根據範例輸出發現nextInt()會回傳正整數或負整數，而其中的祕密藏在next()。
+```
+public int nextInt()
+{
+    return next(32);
+}
+```
+
+*    nextInt(int n)
+
+根據範例輸出發現nextInt(n)會回傳0到n-1之間的正整數，細看實作：
+1. 當n<=0程式會丟出例外處理(就是Runtime Error的一種)。
+2. 當n是2的某次方，就把n倍的next(31)往右移31個位置，其左邊填補原本最左邊的位元值，再回傳。
+**為什麼```(n & -n) == n```成真，則n是2的某次方？**
+我們知道2的某次方在二進位制一定只有一個1和一些0，例如
+$(1000)_2 = (8)_{10}$
+$(0100)_2 = (4)_{10}$
+$(0010)_2 = (2)_{10}$
+$(0001)_2 = (1)_{10}$
+反之則其二進位序列至少有兩個1以上，例如
+$(0101)_2 = (5)_{10}$
+我們假設$n = (0100)_2$，則$-n = (1011)_2 + 1 = (1100)_2$，所以可以得到$n \land -n = (0100)_2 =n$。
+觀察其中奧妙就是n的唯一的1的所有左邊位元與其補數透過AND運算子都會變成0，而右邊因為-n是補數加1則會進位成一模一樣；然而若n為0101就沒有右邊的特性。
+3. 當n是其餘狀況，就回傳next(31)除以n的餘數，並且這個餘數要小於或等於next(31)+n-1，否則就再算一次next(31)...。**不管怎樣這個部份一定是回傳0至n-1的數值(因為回傳的是某數除以n的餘數)**。
+```
+public int nextInt(int n)
+{
+    if (n <= 0)
+        throw new IllegalArgumentException("n must be positive");
+    if ((n & -n) == n) // i.e., n is a power of 2
+        return (int) ((n * (long) next(31)) >> 31);
+    int bits, val;
+    do
+    {
+        bits = next(31);
+        val = bits % n;
+    }
+    while (bits - val + (n - 1) < 0);
+    return val;
+}
+```
+*    next()
+
+我們看見每呼叫一次next()就會更新一次this.seed，其實所有的祕密都藏在next()的實作裡，因為nextInt()或nextInt(int n)都是呼叫next()並把它回傳的值透過固定的方式限制於某個數值以內。 
+
+```
+protected synchronized int next(int bits)
+{
+    seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);
+    return (int) (seed >>> (48 - bits));
+}
+```
+*    小結
+
+觀察nextInt(int n)和next()的實作可以很明顯地發現Random是採用[導讀](http://novus.pixnet.net/blog/post/32238099-%E9%9B%BB%E8%85%A6%E7%9A%84%E9%9A%A8%E6%A9%9F%E6%95%B8%E6%98%AF%E5%A6%82%E4%BD%95%E5%81%9A%E5%88%B0%E7%9A%84%3F)提到的線性同餘法(Linear Congruential Formula)來產生新亂數。到這裡我發現若要以數學角度去解釋這種實作方式的位元池夠不夠大(也就是亂數夠不夠亂)，以目前的能力來說有困難，因為我們連最基本的**Bitwise Operator都不熟悉**。權衡之下，與其去借來The Art of Computer Programming囫圇吞下一堆數學符號，不如我們借這次機會熟悉那些運算子。
+
+### 試猜Random的祕密
+為了釐清位元運算子的祕密，我們重新兜湊幾個在Random裡面關鍵的method並加上適當的階段性輸出。
+範例輸出：
+```
+After setSeed(10), seed = (1010 ^ 10111011110111011001110011001101101) & 111111111111111111111111111111111111111111111111 = 10111011110111011001110011001100111
+seed = (10111011110111011001110011001100111 * 10111011110111011001110011001101101 + 1011) & 111111111111111111111111111111111111111111111111 = 101110101111110101111010110100101010001111100110
+Without setting range for random ouput, next(32) generates value 1111111111111111111111111111111110111010111111010111101011010010
+======================
+After setSeed(10), seed = (1010 ^ 10111011110111011001110011001101101) & 111111111111111111111111111111111111111111111111 = 10111011110111011001110011001100111
+seed = (10111011110111011001110011001100111 * 10111011110111011001110011001101101 + 1011) & 111111111111111111111111111111111111111111111111 = 101110101111110101111010110100101010001111100110
+Before shifting, value 10000 * 1011101011111101011110101101001 = 10111010111111010111101011010010000
+With setting range (power of 2) for random ouput, nextInt(16) generates value 1011
+======================
+After setSeed(10), seed = (1010 ^ 10111011110111011001110011001101101) & 111111111111111111111111111111111111111111111111 = 10111011110111011001110011001100111
+seed = (10111011110111011001110011001100111 * 10111011110111011001110011001101101 + 1011) & 111111111111111111111111111111111111111111111111 = 101110101111110101111010110100101010001111100110
+temporary value = 1011101011111101011110101101001 % 10001 = 11
+With setting range for random ouput, nextInt(17) generates value 11
+```
+直接看碼：
+```
+class GuessRandom {
+
+        private static long seed;
+
+        public static void main(String[] args)
+        {
+                long val;
+
+                System.out.print("After setSeed(10), ");
+                setSeed(10);
+                val = next(32);
+                System.out.println("Without setting range for random ouput, next(32) generates value " + getBin(val));
+
+                System.out.println("======================");
+
+                System.out.print("After setSeed(10), ");
+                setSeed(10);
+                val = nextInt(16);
+                System.out.println("With setting range (power of 2) for random ouput, nextInt(16) generates value " + getBin(val));
+
+                System.out.println("======================");
+
+                System.out.print("After setSeed(10), ");
+                setSeed(10);
+                val = nextInt(17);
+                System.out.println("With setting range for random ouput, nextInt(17) generates value " + getBin(val));
+
+        }
+        
+        public static int nextInt(int n)
+        {
+                if (n <= 0)
+                        throw new IllegalArgumentException("n must be positive");
+                if ((n & -n) == n) {// i.e., n is a power of 2
+                        long next_31 = next(31);
+                        System.out.println("Before shifting, value " + getBin(n) + " * " + getBin(next_31) + " = " + getBin(n * (long) next_31));
+                        return (int) ((n * (long) next_31) >> 31);
+                }
+                int bits, val;
+                do
+                {
+                        bits = next(31);
+                        val = bits % n;
+                        System.out.println("temporary value = " + getBin(bits) + " % " + getBin(n) + " = " + getBin(val));
+                }
+                while (bits - val + (n - 1) < 0);
+                return val;
+        }
+
+        public static int next(int bits)
+        {
+                System.out.print("seed = (" + getBin(seed) + " * " + getBin(0x5DEECE66DL) + " + " + getBin(0xBL) + ") & " + getBin((1L << 48) - 1) + " = ");
+                seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);
+                System.out.println(getBin(seed));
+                return (int) (seed >>> (48 - bits));
+        }
+
+        public static void setSeed(long seed)
+        {
+                System.out.print("seed = (" + getBin(seed) + " ^ " + getBin(0x5DEECE66DL) + ") & " + getBin((1L << 48) - 1) + " = ");
+                GuessRandom.seed = (seed ^ 0x5DEECE66DL) & ((1L << 48) - 1);
+                System.out.println(getBin(GuessRandom.seed));
+        }
+
+        public static String getBin(long x){
+                return Long.toBinaryString(x);
+        }
+
+}
+```
+
+### Math.random()怎麼用？
+利用Math.random()得到介於1到10之間正整數的作法。
+直接看碼：
+```
+import java.lang.Math;
+
+public class TestMathRandom {
+    public static void main(String[] args) {
+        int a=10,b=1;
+        int x = (int) (Math.random() * a ) + b;
+        System.out.println(x);
+    }
+}
+```
+解釋一下：
+0 <= Math.random() < 1
+0 <= Math.random() * a < a
+b <= Math.random() * a + b < a + b
+然後我們就可以得到介於b(含)到a+b(不含)之間的亂數了。
+
+### 進階的書
+Donald E. Knuth. 1997. The Art of Computer Programming, Volume 2 (3rd Ed.): Seminumerical Algorithms. Addison-Wesley Longman Publishing Co., Inc., Boston, MA, USA.
+
+**[Back to top](#目錄)**
