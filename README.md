@@ -436,10 +436,10 @@ a <<= 1;
  ### 二補數(2's Complement)系統
  Java的int變數佔4個byte，也就是32個bit，每個bit上面不是0就是1。
 例如  
-![equation](http://www.sciweavers.org/tex2img.php?eq=%24%2800000000%2000000000%2000000000%2000000001%29_2%20%3D%20%281%29_%7B10%7D%24%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)   
-![equation](http://www.sciweavers.org/tex2img.php?eq=%24%2800000000%2000000000%2000000000%2000000111%29_2%20%3D%20%287%29_%7B10%7D%24%20%0A&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
-![equation](http://www.sciweavers.org/tex2img.php?eq=%24%2800000000%2000000000%2000000000%2000000010%29_2%20%3D%20%282%29_%7B10%7D%24&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
-![equation](http://www.sciweavers.org/tex2img.php?eq=%24%2800000000%2000000000%2000000000%2000000111%292%20%3D%20%287%29%7B10%7D%24%0A&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)  
+```00000000 00000000 00000000 00000001 = 1```  
+```00000000 00000000 00000000 00000010 = 2```  
+```00000000 00000000 00000000 00000100 = 4```  
+
 聰明如你，那負整數怎麼辦？
 所謂的二補數系統，就是在能夠表達負整數的那麼多種系統中的其中一個系統而已。
 它的特徵就是把最左邊的位元當作正負號，1代表負數，0代表正數。
