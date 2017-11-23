@@ -565,10 +565,10 @@ public Random()
 }
 ```
 發現好玩的事情了嗎？this()是什麼？  
-我們之前講過this就是指「Random這個物件」，所以this()在這裡就是用來呼叫「Random(long seed)」。故就算你用no-arg的Random()去創建物件，它其實也是去呼叫Random(long seed)，只是只是！！！它幫你傳入的亂數種子是「當下時間」，又因為你每次執行程式的當下時間一定不一樣(可能差幾毫秒鐘)，所以乍看之下，我們誤以為Random()創建的物件所得到的亂數是不固定的。  
+我們之前講過this就是指「Random這個物件」，所以this()在這裡就是用來呼叫「Random(long seed)」。故就算你用no-arg的Random()去創建物件，它其實也是去呼叫Random(long seed)，只是只是！！！它幫你傳入的亂數種子是「當下時間」，又因為你每次執行程式的當下時間一定不一樣(可能差幾毫秒鐘)，所以乍看之下，我們誤以為Random()創建的物件所得到的亂數是不固定的。    
 *    Random(long seed)
 
-如果看不懂上一段講什麼，那白話文就是  
+如果看不懂上一段講什麼，那白話文就是   
 ```java
 Random random = new Random();
 ```
@@ -596,26 +596,26 @@ public synchronized void setSeed(long seed)
 ```
 我們需要解讀this.seed被設成什麼？  
 先備知識：  
-1. [Bitwise Operator的奇淫巧技](https://hackmd.io/s/BJV65qVgW)
+1. [Bitwise Operator的奇淫巧技](#bitwise-operator的奇淫巧技)  
 
-2. 用**0x**開頭表示十六進位的數字。
+2. 用**0x**開頭表示十六進位的數字。  
 
-3. 數字以**L**結尾，代表那個數字的型態是long。
+3. 數字以**L**結尾，代表那個數字的型態是long。  
 
 首先```((1L << 48) - 1)```為$2^{48} - 1$，因為把二進位的1向左移48個位置再補0，轉成十進位，再減1。  
 
-再來看```0x5DEECE66DL```在不同的進位制是多少？
+再來看```0x5DEECE66DL```在不同的進位制是多少？  
 <table>
 <tr><td>Binary Digits</td><td>10111011110111011001110011001101101</td></tr>
 <tr><td>Decimal Digits</td><td>25214903917</td></tr>
 <tr><td>Hexadecimal Digits</td><td>5DEECE66D</td></tr>
 </table>
 
-全部查完了，你就能恍然明白
+全部查完了，你就能恍然明白  
 ``` this.seed = (seed ^ 0x5DEECE66DL) & ((1L << 48) - 1);```
-為什麼要這樣設嗎？
-才有鬼！
-我們先繼續把這幾個用到的method之間呼叫的關係釐清。
+為什麼要這樣設嗎？  
+才有鬼！  
+我們先繼續把這幾個用到的method之間呼叫的關係釐清。  
 
 *    nextInt()
 
@@ -627,13 +627,13 @@ public int nextInt()
 }
 ```
 
-*    nextInt(int n)
+*    nextInt(int n)  
 
-根據範例輸出發現nextInt(n)會回傳0到n-1之間的正整數，細看實作：
-1. 當n<=0程式會丟出例外處理(就是Runtime Error的一種)。
-2. 當n是2的某次方，就把n倍的next(31)往右移31個位置，其左邊填補原本最左邊的位元值，再回傳。
-**為什麼```(n & -n) == n```成真，則n是2的某次方？**
-我們知道2的某次方在二進位制一定只有一個1和一些0，例如  
+根據範例輸出發現nextInt(n)會回傳0到n-1之間的正整數，細看實作：  
+1. 當n<=0程式會丟出例外處理(就是Runtime Error的一種)。  
+2. 當n是2的某次方，就把n倍的next(31)往右移31個位置，其左邊填補原本最左邊的位元值，再回傳。  
+**為什麼```(n & -n) == n```成真，則n是2的某次方？**  
+我們知道2的某次方在二進位制一定只有一個1和一些0，例如   
 $(1000)_2 = (8)_{10}$  
 $(0100)_2 = (4)_{10}$  
 $(0010)_2 = (2)_{10}$  
@@ -671,13 +671,13 @@ protected synchronized int next(int bits)
     return (int) (seed >>> (48 - bits));
 }
 ```
-*    小結
+*    小結  
 
-觀察nextInt(int n)和next()的實作可以很明顯地發現Random是採用[導讀](http://novus.pixnet.net/blog/post/32238099-%E9%9B%BB%E8%85%A6%E7%9A%84%E9%9A%A8%E6%A9%9F%E6%95%B8%E6%98%AF%E5%A6%82%E4%BD%95%E5%81%9A%E5%88%B0%E7%9A%84%3F)提到的線性同餘法(Linear Congruential Formula)來產生新亂數。到這裡我發現若要以數學角度去解釋這種實作方式的位元池夠不夠大(也就是亂數夠不夠亂)，以目前的能力來說有困難，因為我們連最基本的**Bitwise Operator都不熟悉**。權衡之下，與其去借來The Art of Computer Programming囫圇吞下一堆數學符號，不如我們借這次機會熟悉那些運算子。
+觀察nextInt(int n)和next()的實作可以很明顯地發現Random是採用[導讀](http://novus.pixnet.net/blog/post/32238099-%E9%9B%BB%E8%85%A6%E7%9A%84%E9%9A%A8%E6%A9%9F%E6%95%B8%E6%98%AF%E5%A6%82%E4%BD%95%E5%81%9A%E5%88%B0%E7%9A%84%3F)提到的線性同餘法(Linear Congruential Formula)來產生新亂數。到這裡我發現若要以數學角度去解釋這種實作方式的位元池夠不夠大(也就是亂數夠不夠亂)，以目前的能力來說有困難，因為我們連最基本的**Bitwise Operator都不熟悉**。權衡之下，與其去借來The Art of Computer Programming囫圇吞下一堆數學符號，不如我們借這次機會熟悉那些運算子。  
 
-### 試猜Random的祕密
+### 試猜Random的祕密  
 為了釐清位元運算子的祕密，我們重新兜湊幾個在Random裡面關鍵的method並加上適當的階段性輸出。
-範例輸出：
+範例輸出：  
 ```
 After setSeed(10), seed = (1010 ^ 10111011110111011001110011001101101) & 111111111111111111111111111111111111111111111111 = 10111011110111011001110011001100111
 seed = (10111011110111011001110011001100111 * 10111011110111011001110011001101101 + 1011) & 111111111111111111111111111111111111111111111111 = 101110101111110101111010110100101010001111100110
@@ -693,7 +693,7 @@ seed = (10111011110111011001110011001100111 * 1011101111011101100111001100110110
 temporary value = 1011101011111101011110101101001 % 10001 = 11
 With setting range for random ouput, nextInt(17) generates value 11
 ```
-直接看碼：
+直接看碼：  
 ```java
 class GuessRandom {
 
@@ -766,9 +766,9 @@ class GuessRandom {
 }
 ```
 
-### Math.random()怎麼用？
-利用Math.random()得到介於1到10之間正整數的作法。
-直接看碼：
+### Math.random()怎麼用？  
+利用Math.random()得到介於1到10之間正整數的作法。  
+直接看碼：  
 ```java
 import java.lang.Math;
 
@@ -780,7 +780,7 @@ public class TestMathRandom {
     }
 }
 ```
-解釋一下：  
+解釋一下：   
 0 <= Math.random() < 1  
 0 <= Math.random() * a < a  
 b <= Math.random() * a + b < a + b  
@@ -792,12 +792,12 @@ Donald E. Knuth. 1997. The Art of Computer Programming, Volume 2 (3rd Ed.): Semi
 **[Back to top](#目錄)**
 
 ## 問題大雜燴
-這裡擺放不知道怎麼分類但是蠻有趣的筆記，歡迎各方英雄好漢相繼補充。
+這裡擺放不知道怎麼分類但是蠻有趣的筆記，歡迎各方英雄好漢相繼補充。  
 
 ### 【題型】計算單字出現次數 
 *    消掉句點
 
-直接看碼:
+直接看碼:  
 ```java
 String text = "A string is a sequence of characters. Strings are frequently used in programming. In many
 languages, strings are treated as an array of characters, but in Java a string is treated as an
@@ -806,7 +806,7 @@ text = text.replaceAll("\\.", "");
 text = text.toLowerCase();
 String[] words = text.split(" ");
 ```
-解釋一下:  
+解釋一下:   
 replaceAll()的第一個引數要用正規表達式，例如「\\\\.」是句點的正規表達式，而這整個函式是用來把text裡面所有的句點都消去。當題目的輸入字串是由夾雜句點的句子所構成時就很好用。  
 
 正規表達式是什麼?  
@@ -829,17 +829,17 @@ public class StammerTranslater {
      }
 }
 ```
-正規表達式處理字串很強大，絕對值得一邊Google一邊閱讀推薦的書[1]。
-*   你知道ArrayList<String>可以裝東西。
-*   再讓你知道Map<String, Integer>可以一邊裝單字一邊裝數量。
+正規表達式處理字串很強大，絕對值得一邊Google一邊閱讀推薦的書[1]。  
+*   你知道ArrayList<String>可以裝東西。  
+*   再讓你知道Map<String, Integer>可以一邊裝單字一邊裝數量。  
 
-### 【JavaFX】Pane來Pane去的眉角
+### 【JavaFX】Pane來Pane去的眉角  
 *    Pane - getChildren().add()
 *    StackPane - getChildren().add()
 *    GridPane - add()
 *    BorderPane - setCenter(), setBottom()
 
-### 推薦的書
+### 推薦的書  
 [1] J. E. F. Friedl (2006). Mastering Regular Expressions (3rd ed.). O'Reilly Media, Inc.
 
 **[Back to top](#目錄)**
