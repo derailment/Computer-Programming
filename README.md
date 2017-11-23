@@ -41,7 +41,7 @@ Ctrl+Shift+F可以縮排整份source code。
 
 ### 用for列舉array有兩種方式
 以下用範例說明這兩種用法要注意的事情
-```
+```java
 public class Test {
     public static void main(String[] args) {
         int[] numbers = { 1, 2, 3 };             
@@ -97,7 +97,7 @@ Dog2's leg: 6
 This can be called in main
 
 範例源始碼：
-```
+```java
 public class Dog{
     
     public String name;
@@ -192,7 +192,7 @@ No way。
 
 *   main method是程式的進入點
 *   constructor是method，例如:
-```
+```java
 class Ship{
     Ship(){} // 這東西叫建構子，它是一個沒有回傳東西的public method
 }
@@ -254,7 +254,7 @@ Scanner放哪裡? Scanner提供我們各種應付標準輸入型態的method，�
 
 *   多型(Polymorphism)就是一個物件在執行時期可以被當成不只一種型別(類別)。
 講個沒弄懂多型會發生Runtime Error或Compiling Error的例子：
-```
+```java
 public class RPG {
     public static void main(String[] args){
                 
@@ -282,11 +282,11 @@ public class RPG {
 ## 物件住在哪裡
 
 每當我們創建物件時其實我們是在幫一堆位元資料找一個家安置，而那個家就是俗稱的記憶體位置。
-```
+```java
 Object o = new Object(); 
 ```
 以下示範物件何時會隨著「=」搬家：
-
+```
 After tmpLine = lines[i - 1];  
 Temporary Line is at Line2D@6d06d69c  
 Indexed Line is at Line2D@6d06d69c  
@@ -317,9 +317,9 @@ Indexed Line is at Line2D@4e25154f
 After lines[i - 1] = lines[j];  
 Temporary Line is at Line2D@4e25154f  
 Indexed Line is at Line2D@4e25154f  
-
-直接看碼：
 ```
+直接看碼：
+```java
 public class TestLine2D {
 	public static void main(String[] args) {
 		Line2D[] lines = new Line2D[5];
@@ -384,12 +384,12 @@ class Line2D {
 
 ## Bitwise Operator的奇淫巧技
 在Java舉凡能夠視為整數值的型別(int、long、short、byte、char)變數都可以被轉成二進位制以Bitwise Operator操作，例如
-```
+```java
 int a=1;
 a *= 2;
 ```
 等價
-```
+```java
 a <<= 1;
 ```
 ### 為什麼要用Bitwise Operator?
@@ -519,7 +519,7 @@ $(11111111 11111111 11111111 11111111)_2 = -1 ＝ -2 \div2$
 這兩者「使用」上，最大的差別是Random可以設亂數種子，但是當程式設下亂數種子後，發現每次產生的數字序列竟然是固定的？可是，亂數不是應該要很亂嗎？
 
 直接看碼：
-```
+```java
 import java.util.Random;
 public class TestRandom {
     public static void main(String[] args) {
@@ -541,7 +541,7 @@ nextInt():  -1150867590 -1704868423 884779003 -29161773 -885414485 -1791719506 7
 nextInt(45):  41 32 5 0 8 41 24 28 7 21
 
 如果我們把創建Random物件的方式改為no-arg constructor：
-```
+```java
 Random random = new Random();
 ```
 每次的執行結果就會不一樣了。
@@ -558,7 +558,7 @@ Random random = new Random();
 *    Random()
 
 如果你要讓每次的執行結果不一樣，就不要設固定的亂數種子，採用Random()。
-```
+```java
 public Random()
 {
     this(System.currentTimeMillis());
@@ -569,17 +569,17 @@ public Random()
 *    Random(long seed)
 
 如果看不懂上一段講什麼，那白話文就是
-```
+```java
 Random random = new Random();
 ```
 等價
-```
+```java
 Random random = new Random(System.currentTimeMillis());
 ```
 結束。
 
 我們來看看那Random(long seed)在做什麼？
-```
+```java
 public Random(long seed)
 {
     setSeed(seed);
@@ -587,7 +587,7 @@ public Random(long seed)
 ```
 seed是Random的private long data field，然後又要去看setSeed(long seed)在做什麼。
 *    setSeed(long seed)
-```
+```java
 public synchronized void setSeed(long seed)
 {
     this.seed = (seed ^ 0x5DEECE66DL) & ((1L << 48) - 1);
@@ -620,7 +620,7 @@ public synchronized void setSeed(long seed)
 *    nextInt()
 
 根據範例輸出發現nextInt()會回傳正整數或負整數，而其中的祕密藏在next()。
-```
+```java
 public int nextInt()
 {
     return next(32);
@@ -643,7 +643,7 @@ $(0101)_2 = (5)_{10}$
 我們假設$n = (0100)_2$，則$-n = (1011)_2 + 1 = (1100)_2$，所以可以得到$n \land -n = (0100)_2 =n$。
 觀察其中奧妙就是n的唯一的1的所有左邊位元與其補數透過AND運算子都會變成0，而右邊因為-n是補數加1則會進位成一模一樣；然而若n為0101就沒有右邊的特性。
 3. 當n是其餘狀況，就回傳next(31)除以n的餘數，並且這個餘數要小於或等於next(31)+n-1，否則就再算一次next(31)...。**不管怎樣這個部份一定是回傳0至n-1的數值(因為回傳的是某數除以n的餘數)**。
-```
+```java
 public int nextInt(int n)
 {
     if (n <= 0)
@@ -664,7 +664,7 @@ public int nextInt(int n)
 
 我們看見每呼叫一次next()就會更新一次this.seed，其實所有的祕密都藏在next()的實作裡，因為nextInt()或nextInt(int n)都是呼叫next()並把它回傳的值透過固定的方式限制於某個數值以內。 
 
-```
+```java
 protected synchronized int next(int bits)
 {
     seed = (seed * 0x5DEECE66DL + 0xBL) & ((1L << 48) - 1);
@@ -694,7 +694,7 @@ temporary value = 1011101011111101011110101101001 % 10001 = 11
 With setting range for random ouput, nextInt(17) generates value 11
 ```
 直接看碼：
-```
+```java
 class GuessRandom {
 
         private static long seed;
@@ -769,7 +769,7 @@ class GuessRandom {
 ### Math.random()怎麼用？
 利用Math.random()得到介於1到10之間正整數的作法。
 直接看碼：
-```
+```java
 import java.lang.Math;
 
 public class TestMathRandom {
@@ -798,7 +798,7 @@ Donald E. Knuth. 1997. The Art of Computer Programming, Volume 2 (3rd Ed.): Semi
 *    消掉句點
 
 直接看碼:
-```
+```java
 String text = "A string is a sequence of characters. Strings are frequently used in programming. In many
 languages, strings are treated as an array of characters, but in Java a string is treated as an
 object. This chapter introduces the classes for processing strings.";
@@ -811,7 +811,7 @@ replaceAll()的第一個引數要用正規表達式，例如「\\\\.」是句點
 
 正規表達式是什麼?
 範例：Mr. Bon口吃（正規版解法）
-```
+```java
 import java.util.*;
 import java.util.regex.*;
 
