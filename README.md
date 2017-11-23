@@ -510,6 +510,10 @@ a <<= 1;
 ### 小工具
 [進位換算計算機](http://dec.0123456789.tw/)
 
+### 參考來源
+[What are bitwise shift (bit-shift) operators and how do they work?
+](https://stackoverflow.com/questions/141525/what-are-bitwise-shift-bit-shift-operators-and-how-do-they-work/141873#141873)
+
 **[Back to top](#目錄)**
 
 ## 亂數夠不夠亂
