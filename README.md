@@ -282,40 +282,41 @@ public class RPG {
 ## 物件住在哪裡
 
 每當我們創建物件時其實我們是在幫一堆位元資料找一個家安置，而那個家就是俗稱的記憶體位置。
+```
 Object o = new Object(); 
-
+```
 以下示範物件何時會隨著「=」搬家：
 
-After tmpLine = lines[i - 1];
-Temporary Line is at Line2D@6d06d69c
-Indexed Line is at Line2D@6d06d69c
-After lines[i - 1] = lines[j];
-Temporary Line is at Line2D@6d06d69c
-Indexed Line is at Line2D@7852e922
-After tmpLine = lines[i - 1];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@4e25154f
-After lines[i - 1] = lines[j];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@6d06d69c
-After tmpLine = lines[i - 1];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@4e25154f
-After lines[i - 1] = lines[j];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@70dea4e
-After tmpLine = lines[i - 1];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@4e25154f
-After lines[i - 1] = lines[j];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@5c647e05
-After tmpLine = lines[i - 1];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@4e25154f
-After lines[i - 1] = lines[j];
-Temporary Line is at Line2D@4e25154f
-Indexed Line is at Line2D@4e25154f
+After tmpLine = lines[i - 1];  
+Temporary Line is at Line2D@6d06d69c  
+Indexed Line is at Line2D@6d06d69c  
+After lines[i - 1] = lines[j];  
+Temporary Line is at Line2D@6d06d69c  
+Indexed Line is at Line2D@7852e922  
+After tmpLine = lines[i - 1];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@4e25154f  
+After lines[i - 1] = lines[j];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@6d06d69c  
+After tmpLine = lines[i - 1];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@4e25154f  
+After lines[i - 1] = lines[j];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@70dea4e  
+After tmpLine = lines[i - 1];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@4e25154f  
+After lines[i - 1] = lines[j];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@5c647e05  
+After tmpLine = lines[i - 1];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@4e25154f  
+After lines[i - 1] = lines[j];  
+Temporary Line is at Line2D@4e25154f  
+Indexed Line is at Line2D@4e25154f  
 
 直接看碼：
 ```
