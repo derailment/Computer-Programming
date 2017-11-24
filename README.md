@@ -89,13 +89,13 @@ public class Test {
 ### 要不要static?
 static是相對於this的關鍵字。this用來代表屬於「這個物件」的成員，static用來代表屬於「這個類別」的成員。我們用個範例來解釋這一切。
 
-範例輸出：
-This can not be called in main
-Dog1's breed: Labrador
-Dog1's leg: 6
-Dog2's breed: Labrador
-Dog2's leg: 6
-This can be called in main
+範例輸出：  
+This can not be called in main  
+Dog1's breed: Labrador  
+Dog1's leg: 6  
+Dog2's breed: Labrador  
+Dog2's leg: 6  
+This can be called in main  
 
 範例源始碼：
 ```java
