@@ -1,6 +1,6 @@
 Usage: 
 * Input must be csv file.
-* Placed each student name line by line.
+* Place each student name line by line.
 
 | Name1 |
 |------|
